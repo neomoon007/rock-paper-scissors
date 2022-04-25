@@ -8,16 +8,22 @@ function computerPlay() {
     return choice;
 }; // End computerPlay function
 
-// Create a function called playRound that receive (playerSelection, computerSelection) and returns the winner on this round
-function playRound(playerSelection="Rock", computerSelection) {
-    // If the player has not inputted anything, assume it's "Rock"
-    if (playerSelection == null || undefined) {
-        playerSelection = "Rock" 
-    }; // Endif
-    // Create a variable called playerChoice that stores the playerSelection with Uppercase on the first letter and lowercase on the rest
-    let playerChoice = playerSelection.charAt(0).toUpperCase() + playerSelection.slice(1).toLowerCase();
-    // Create a variable called computerChoice that stores the computerSelection with Uppercase on the first letter and lowercase on the rest
-    let computerChoice = computerSelection.charAt(0).toUpperCase() + computerSelection.slice(1).toLowerCase();
+// Add an event listener to each weapon in the html doc
+// Event listener starts the round
+let w_paper = document.getElementById("paper").addEventListener("click", function() { playRound("paper") });
+let w_rock = document.getElementById("rock").addEventListener("click", function() { playRound("rock") });
+let w_scissors = document.getElementById("scissors").addEventListener("click", function() { playRound("scissors") });
+
+// Create a variable for the scores and round description div
+let playerScore = document.getElementById("player-score");
+let computerScore = document.getElementById("computer-score");
+let roundDesc = document.getElementById("round-result-description");
+let winner = "";
+
+function playRound(move_made) {
+    let playerChoice = move_made.charAt(0).toUpperCase() + move_made.slice(1).toLowerCase();
+    let computerChoice = computerPlay();
+
     // Create a variable called playerWin1 that stores playerChoice === "Rock" && computerChoice === "Scissors"
     let playerWin1 = playerChoice === "Rock" && computerChoice === "Scissors";
     // Create a variable called playerWin2 that stores playerChoice === "Paper" && computerChoice === "Rock"
@@ -25,74 +31,50 @@ function playRound(playerSelection="Rock", computerSelection) {
     // Create a variable called playerWin3 that stores playerChoice === "Scissors" && computerChoice === "Paper"
     let playerWin3 = playerChoice === "Scissors" && computerChoice === "Paper";
 
-    // If the player chose the same weapon as the computer
     if (playerChoice === computerChoice) {
-        //  Tell the player "It's a tie!"
-        console.log("It's a tie!");
-        //  Tell the game function that this round no one earns a point by returning "tie"
-        return "tie";
+        // Tell it's a tie
+        roundDesc.textContent = `It's a tie! ${playerChoice} and ${computerChoice} are equal`;
 
         // If the player win this round
     } else if (playerWin1 || playerWin2 || playerWin3) {
         //  Tell the player that he won on this round, and output the weapons used "You Win! $playerChoice beats $computerChoice"
-        console.log(`You Win! ${playerChoice} beats ${computerChoice}`);
-        //  Tell the game function that the player won this round by returning "player"
-        return "player";
+        roundDesc.textContent = `You Win! ${playerChoice} beats ${computerChoice}`;
+        playerScore.textContent = +playerScore.textContent + 1;
 
         // If the player didn't win, and it isn't a tie, then the computer wins
     } else {
         //  Tell the player he lost the round and output the weapons used "You Lose! $computerChoice beats $playerChoice"
-        console.log(`You Lose! ${computerChoice} beats ${playerChoice}`)
-        //  Tell the game function that the player lost this round by returning "computer"
-        return "computer";
-    }; // End the If statement
-}; // End playRound function
+        roundDesc.textContent = `You Lose! ${computerChoice} beats ${playerChoice}`;
+        computerScore.textContent = +computerScore.textContent + 1;
+}
 
-// Create a function called game that runs the game and return the winner and the final score
-function game() {
-    // Create a variable called playerScore
-    let playerScore = 0;
-    // Create a variable called computerScore
-    let computerScore = 0;
-    // Create a variable called playerMove
-    let playerMove = "";
-    // Create a variable called roundResult 
-    let roundResult = "";
+    if (isGameOver()) {
+        winner = getWinner();
 
-    // Create a Loop that run 5 times
-    for (let i = 1, rounds = 5; i <= rounds; i++) { 
-        //  playerMove receive the player weapon for this round
-        playerMove = prompt("Choose your weapon: Rock, Paper or Scissors");
-        // roundResult receive the playRound(playerMove, computerPlay()) function returned value
-        roundResult = playRound(playerMove, computerPlay());
-        //  If the player win this round
-        if (roundResult == "player") { 
-            //     add a point to the player
-            ++playerScore;
-        //  If the computer win this round
-        } else if (roundResult == "computer") {
-        //     increment computerScore
-            ++computerScore;
-        }; // End if statement
-    }; // End loop
+        roundDesc.textContent = "";
+        alert(`It's game over! ${winner} is the winner!`);
 
-    // If ( playerScore > computerScore )
-    if (playerScore > computerScore) {
-    //     Tell the player "You Won the game!"
-       console.log("You Won the game!") 
-    // Elseif ( computerScore > playerScore )
-    } else if (computerScore > playerScore) {
-    //     Print "You Lost the game!"
-        console.log("You Lost the game!");
-    // Elseif ( playerScore == computerScore )
-    } else if (playerScore == computerScore) {
-    //     Print "It's a tie!"
-        console.log("It's a tie!");
-    // Endif
-    };
+        playerScore.textContent = "0";
+        computerScore.textContent = "0";
+    }
+};
 
-    // Print "You: $playerScore"
-    console.log(`You: ${playerScore}`);
-    // Print "Computer: $computerScore" 
-    console.log(`Computer: ${computerScore}`);
-}; // End game function
+function getWinner() {
+    let playerPoints = +playerScore.textContent;
+    let computerPoints = +computerScore.textContent;
+
+    if (playerPoints > computerPoints) {
+       return "Player";
+    } else if (computerPoints > playerPoints) {
+       return "Computer";
+    }
+};
+
+function isGameOver() {
+    let numberOfRounds = +playerScore.textContent + +computerScore.textContent;
+    if (numberOfRounds == 5) {
+        return true;
+    } else {
+        return false;
+    }
+};
