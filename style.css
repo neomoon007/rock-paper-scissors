@@ -1,6 +1,5 @@
-body {
-    display: flex;
+.container {
+    text-align: center;
+    padding-top: 100px;
 }
 
-h1 {
-}
